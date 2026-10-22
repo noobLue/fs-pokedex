@@ -4,7 +4,7 @@ This repository is used for the CI/CD module of the Full Stack Open course
 
 ## App Demo
 
-Access the app on 
+Access the app on
 
 https://fs-pokedex-smi9.onrender.com
 
