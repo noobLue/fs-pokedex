@@ -8,6 +8,10 @@ Access the app on
 
 https://fs-pokedex-smi9.onrender.com
 
+## Pull requests
+
+adding pull requests to pipeline...
+
 ## Commands
 
 Start by running `npm install` inside the project folder
