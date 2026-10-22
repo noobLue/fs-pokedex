@@ -10,6 +10,8 @@ app.get('/health', (req, res) => {
   res.send('ok')
 })
 
+const lint_fail = false;
+
 const start = async () => {
   await app.listen(PORT)
   console.log(`server started on port ${PORT}`)
