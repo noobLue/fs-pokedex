@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  simple_deployment_pipeline:
+  build-pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -40,27 +40,41 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+  
+  deploy-pipeline:
+    runs-on: ubuntu-latest
+    needs: [build-pipeline]
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ';'), '#skip')}}
+    steps:
       - name: Trigger deployment
-        id: deploy
-        if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ';'), '#skip')}}
         run: curl ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+  notify_success:
+    runs-on: ubuntu-latest
+    needs: [deploy-pipeline]
+    if: success()
+    steps:
       - uses: sarisia/actions-status-discord@v1
-        if: steps.deploy.outcome == 'success'
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           title: "Build succeeded!"
-          status: ${{ job.status }}
+          status: success
           color: 0x00ff00
           description: |
             Commit: ${{ github.event.head_commit.url }}
             Message: ${{ github.event.head_commit.message }}
             Author: ${{ github.event.head_commit.author.name }}
+
+  notify_failure:
+    runs-on: ubuntu-latest
+    needs: [build-pipeline, deploy-pipeline]
+    if: failure()
+    steps:
       - uses: sarisia/actions-status-discord@v1
-        if: failure()
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           title: "Build failed!"
-          status: ${{ job.status }}
+          status: failure
           color: 0xff0000
           description: |
             Commit: ${{ github.event.head_commit.url }}
@@ -71,8 +85,7 @@ jobs:
             [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
   tag_release:
-    needs: [simple_deployment_pipeline]
-    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message, ';'), '#skip')}}
+    needs: [deploy-pipeline]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
