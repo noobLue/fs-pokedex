@@ -8,6 +8,15 @@ Access the app on
 
 https://fs-pokedex-smi9.onrender.com
 
+
+## Phonebook / exercise 21
+
+https://github.com/noobLue/fs-cicd-phonebook/
+
+deployed on 
+
+https://fs-cicd-phonebook.onrender.com/
+
 ## Pull requests
 
 adding pull requests to pipeline...
